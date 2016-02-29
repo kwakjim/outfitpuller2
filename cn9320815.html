@@ -1,0 +1,611 @@
+<style type="text/css">
+	#thumbButtonContainer{float: left; height: 175px; width: 380px;left: 445px; position: absolute;top: 260px;}
+	.thumbButton {float:left;width: 105px; height: 175px;}
+	
+	#thumbButton_1{display:block;background-image:url(/Asset_Archive/BRWeb/content/0009/320/815/assets/thumbSprite.png);background-position: -5px -5px; width: 105px; height: 175px;}
+	#thumbButton_1:hover{background-image:url(/Asset_Archive/BRWeb/content/0009/320/815/assets/thumbSprite.png);background-position: -120px -5px; width: 105px; height: 175px;}
+	
+	#thumbButton_2{display:block;background-image:url(/Asset_Archive/BRWeb/content/0009/320/815/assets/thumbSprite.png); background-position: -235px -5px; width: 105px; height: 175px;}
+	#thumbButton_2:hover{background-image:url(/Asset_Archive/BRWeb/content/0009/320/815/assets/thumbSprite.png); background-position:-5px -190px; width: 105px; height: 175px;}
+	
+	#thumbButton_3{display:block;background-image:url(/Asset_Archive/BRWeb/content/0009/320/815/assets/thumbSprite.png); background-position: -120px -190px; width: 167px; height: 175px;}
+	#thumbButton_3:hover{background-image:url(/Asset_Archive/BRWeb/content/0009/320/815/assets/thumbSprite.png); background-position: -350px -5px; width: 167px; height: 175px;}
+	
+	.popupOutfitLayerBox {position:absolute;top:140px; right:0; border:0px solid; width:335px;}
+	
+	.titleBox {position:absolute;top:0px; left:0; width:830px;z-index:91;}
+
+	.productGrid { float:left; padding-top:10px; }	
+	.productGrid li { position:relative; float:left; list-style:none; width:150px; height:260px; padding:0px;/*text-align:center;*/ margin:0; border:0 }
+	
+	.productGrid li .prodFlag { float:left; position:absolute; top:0; left:0; width:89px; height:53px; background-position:top left; background-repeat:no-repeat }}
+	  
+	.productGrid li a { display:block; width:120px; height:260px; font-size:11px; line-height:14px; text-decoration:none; /*text-align:center;*/ border:0; color:#333; font-family:'Gotham Book', Gotham-Book, Arial, sans-serif; }
+		
+	.productGrid li a:hover { border:0 }
+
+	.productGrid li a img { width:120px; height:160px; border:1px #d7d7d7 solid }
+	  
+	.productGrid li a:hover img, .productGrid li a img.hovered { border:1px #886b4d solid }
+	.productGrid li a.soldOut:hover { cursor:default }
+	.productGrid li a.soldOut:hover img { border:1px #eee solid }
+	    
+	.productGrid li a div.outOfStock { float:left; position:absolute; top:75px; left:15px; width:120px; height:20px; background:#f00; font-size:12px; color:#fff; line-height:20px }  
+	.productGrid li a p { font-size:11px; line-height:14px; text-decoration:none; max-height:56px; overflow:hidden; color:#666; font-family:'Gotham Book', Gotham-Book, Arial, sans-serif; }
+	.productGrid li .qlPositioner { position:absolute; top:95px; left:4px; height:20px; width:30px; }	
+		
+	.asset-child.first{
+		width:830px;left:0;position:absolute;overflow:hidden;
+	}
+	.asset-child.last{
+		width:415px;left:415px;position:absolute;overflow:hidden;
+	}
+	
+	.outfitSection {width:830px;position: relative;}
+	
+	.closeButton {height:73px;right:0;top:0;z-index: 90;position: absolute;}
+	.slideHandle {height:73px;right:0;top:74px;z-index: 90;position: absolute;}
+	.sliderBox {position: relative;width:830px; margin: 0 auto; overflow:hidden;z-index: 90;float: left;}
+	.sectionBox {width:830px; position: absolute;}
+	
+</style>
+
+<!--[if lt IE 9]><!--<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>--><![endif]-->
+  <!--
+<link href="/Asset_Archive/BRWeb/content/0009/320/815/assets/relume-min833.css" media="screen, projection" rel="stylesheet" type="text/css">
+<script src="/Asset_Archive/BRWeb/content/0009/320/815/assets/relume-min833.js"></script>
+<script src="/Asset_Archive/BRWeb/content/0009/320/815/assets/jquery-ui.min.css"></script>
+-->
+<script src="/Asset_Archive/BRWeb/content/0009/320/815/assets/jquery-ui.min.js"></script>
+
+
+<div id="shopHeader" style="position:relative;">
+	<img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/topbody.jpg" alt="">
+
+	<div id="thumbButtonContainer">
+		<div class="thumbButton">
+				<a  id="thumbButton_1" onclick="outfittingPopup.controller.popOutfit(0);scrollDownAndTrack('title1',0,'thumb1');" href="javascript:void(0)"><span></span></a>
+		</div>
+		<div class="thumbButton">
+				<a  id="thumbButton_2" onclick="outfittingPopup.controller.popOutfit(1);scrollDownAndTrack('title2',0,'thumb2');" href="javascript:void(0)"><span></span></a>
+		</div>
+		<div class="thumbButton">
+				<a  id="thumbButton_3" onclick="outfittingPopup.controller.popOutfit(2);scrollDownAndTrack('title3',0,'thumb3');" href="javascript:void(0)"><span></span></a>
+		</div>
+ </div>
+</div>
+
+<script type="text/javascript">	
+
+		
+jQuery( document ).ready(function( $ ) {
+		$(".titleBox").click(function(event){				
+			//$(this).hide();
+			
+			if($(this).hasClass( "open" )){//if open class, do nothing.
+				
+			}
+			
+			else {//if not open class, then add open class. open. close all others.	
+				$( ".sectionBox.open" ).each(function() {
+					$(".sectionBox").animate({left: "0"},1000,"easeInOutQuad");
+					$(".sliderBox").animate({ width: "830px"},500,"easeInOutQuad");
+					$(this).removeClass("open");
+					$(".titleBox").show();
+					$(".titleBox").animate({left: "0", opacity: "1"},1000,"easeInOutQuad");
+				});
+				
+				$(this).parent().animate({ width: "415px"},2000,"easeInOutQuad");
+				
+				$(this).animate({left: "-415px", opacity:"0"},2000,"easeInOutQuad", function() {
+					$(this).hide();
+				});
+				
+				$(this).next().animate({left: "-415px"},2000,"easeInOutQuad", function() {
+					$(this).addClass("open");
+				});
+				
+			}	
+		});
+		
+		
+		$(".closeButton").click(function(){
+				$(".sectionBox").animate({left: "0"},1000,"easeInOutQuad");
+				$(".sliderBox").animate({ width: "830px"},500,"easeInOutQuad");
+				$( ".sectionBox.open" ).each(function() {
+					$(this).removeClass("open");
+				});
+				$(".titleBox").show();
+				$(".titleBox").animate({left: "0", opacity: "1"},1000,"easeInOutQuad");
+		});
+});
+
+//console.info('2.02');
+
+
+</script>
+
+<div id="outfitContainer1" class="outfitContainer">
+
+	<div class="outfitSection" style="height:1453px;">
+		<a href="javascript:void(0)" class="closeButton"><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/slidein_close.png"></a>
+		<img class="slideHandle" src="/Asset_Archive/BRWeb/content/0009/320/815/assets/slidein_handle.png">
+		<div class="sliderBox" style="height:1453px;">
+			<div id="title1" class="titleBox" style="height:1453px;"><a onclick="outfittingPopup.controller.popOutfit(0);scrollDownAndTrack('title1',0,'outfit1');" href="javascript:void(0)" /><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/look01_copy.png"></a></div>
+			<div class="sectionBox">
+				<div class="asset-child first"><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/look01_img.jpg" ></div>
+			</div>
+		</div>
+		<div id="popupOutfitLayer0" class="popupOutfitLayerBox"></div>
+	</div>
+	
+	<div class="outfitSection" style="height:1731px;">
+		<a href="javascript:void(0)" class="closeButton" style=""><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/slidein_close.png"></a>
+		<img class="slideHandle" src="/Asset_Archive/BRWeb/content/0009/320/815/assets/slidein_handle.png">
+		<div class="sliderBox" style="height:1731px;">
+			<div id="title2" class="titleBox" style="height:1731px;"><a onclick="outfittingPopup.controller.popOutfit(1);scrollDownAndTrack('title2',0,'outfit2');" href="javascript:void(0)" /><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/look02_copy.png"></a></div>
+			<div class="sectionBox">
+				<div class="asset-child first"><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/look02_img.jpg" ></a></div>
+			</div>
+		</div>
+		<div id="popupOutfitLayer1" class="popupOutfitLayerBox"></div>
+	</div>
+	
+	<div class="outfitSection" style="height:1654px;">
+		<a href="javascript:void(0)" class="closeButton" style=""><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/slidein_close.png"></a>
+		<img class="slideHandle" src="/Asset_Archive/BRWeb/content/0009/320/815/assets/slidein_handle.png">
+		<div class="sliderBox" style="height:1654px;">
+			<div id="title3" class="titleBox" style="height:1654px;"><a onclick="outfittingPopup.controller.popOutfit(2);scrollDownAndTrack('title3',0,'outfit3');" href="javascript:void(0)" /><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/look03_copy.png"></a></div>
+			<div class="sectionBox">
+				<div class="asset-child first"><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/look03_img.jpg" ></div>
+			</div>
+		</div>
+		<div id="popupOutfitLayer2" class="popupOutfitLayerBox"></div>
+	</div>
+	
+	
+</div>
+
+
+<div id="shopFooter" style="position:relative;">
+	<a  id="" onclick="scrollDownAndTrack('shopHeader',0,'backToTop');" href="javascript:void(0)"><img src="/Asset_Archive/BRWeb/content/0009/320/815/assets/Backtotop.gif" alt=""></a>
+</div>
+
+
+
+<script type="text/javascript">	
+/** WCD Web Hierarchy Helper library
+ * @param - type : 'product' or 'category', defaults to product
+ * @param - cid : business ID of category to call
+ * @param - pagesOfProduct [optional]: how much product data to return : '1' is page one, 'all' is all product data
+ * @param - currencySymbol [optional]: symbol to use for currency symbol
+ * @param - returnSoldOut [optional]: returns sold out product with product data set
+ * 
+ * return schema
+ * PRODUCT
+ *	6-digit product ID
+ *  9-digit style ID
+ *  name
+ *  vendor (applies to PL)
+ *  price (formatted string)
+ *  sale price (set to '' if not on sale)
+ *  small image path (category image, not used on site)
+ *  med image path (QL image)
+ *  in stock?
+ */
+
+var WCDWebHierarchyHelperLibrary = Class.create();
+WCDWebHierarchyHelperLibrary.prototype = {
+	initialize: function( type, cid, callbackFunction, pagesOfProduct, currencySymbol, returnSoldOut ) {
+		// Data initialization
+		this.model = new Object();
+		this.model.apiCallType = 'product';
+		this.model.apiCallCID = '';
+		this.model.callbackFunction = void(0);
+		this.model.pagesOfProduct = '1';
+		this.model.apiCallProductPage = '0';
+		this.model.currencySymbol = '$';
+		this.model.returnSoldOut = false;
+		this.model.dataRaw = new Object();
+		this.model.dataArray = new Array();
+		this.model.numProducts = 0;
+
+		this.model.apiCallType = type != "" ? type : 'product';
+		this.model.apiCallCID = cid != "" ? cid : '';
+		this.model.callbackFunction = callbackFunction != "" ? callbackFunction : '';
+		this.model.pagesOfProduct = pagesOfProduct != null ? pagesOfProduct : '1';
+		this.model.currencySymbol = currencySymbol != null ? currencySymbol : '$';
+					
+		var pagesOfProductCall = '0';
+		var apiRequestStr = '/resources/productSearch/v1/search?isFacetsEnabled=true&pageId=' + pagesOfProductCall + '&';
+		if( cid != '' ) { apiRequestStr = apiRequestStr + 'cid=' + cid; }
+		apiRequestStr = apiRequestStr + '&globalShippingCountryCode=us&urlPageId=0';
+					
+		/*var apiRequestStr = '/resources/webHierarchy/v1/';
+		if( this.model.apiCallCID != '' ) {
+			apiRequestStr = apiRequestStr + this.model.apiCallCID;
+		}
+		if( this.model.apiCallType == 'product' ) {
+			// Parse pages of product into API-accepted value
+			if( this.model.pagesOfProduct == 'all' ) {
+				this.model.apiCallProductPage = "-1";
+			}
+			else {
+				this.model.apiCallProductPage = "0";
+			}
+			apiRequestStr = apiRequestStr + '?isProductRequest=true&requestedCategoryPageId=' + this.model.apiCallProductPage;
+		}*/
+		
+		//console.log( apiRequestStr );
+		
+		new Ajax.Request( apiRequestStr, {
+			method:'get',
+			onSuccess: this.apiOnSuccess.bind( this )
+		});
+	},
+	apiOnSuccess: function( transport ) {
+		// Parse returned data into array of objects
+		
+		// Set root JSON node based on API call type
+		if( this.model.apiCallType == "product" && transport.responseJSON.productCategoryFacetedSearch.productCategory ) {
+			this.model.dataRaw = transport.responseJSON.productCategoryFacetedSearch.productCategory;
+			
+			// Loop through JSON object to find product data
+			var dataRaw = this.model.dataRaw;
+			var productData = new Array();
+			
+			for( var propertyName in dataRaw ) {
+				if( propertyName == "childProducts" ) {
+					// If first level contains childProducts, then we are in a subcat sort and THIS cotains the raw product data that we want
+					productData = dataRaw[ propertyName ];
+				}
+				else if( propertyName == "childCategories" ) {
+					// If first level container childCats, then we are in a category made up of subcat sorts
+					var childCategories = dataRaw[ propertyName ];
+					
+					// Check whether childCategories is an array of subcats or a single subcat
+					if( childCategories.length != null ) {
+						// Loop through child cats and concatenate product data arrays into one array
+						for( var i=0; i < childCategories.length; i++ ) {
+							if( childCategories[i].childProducts ) {
+								productData = productData.concat( childCategories[i].childProducts );
+							}
+						}
+					}
+					else {
+						productData = childCategories.childProducts;
+					}
+				}
+			}
+			this.model.dataRaw = productData;
+			
+			// Loop through raw product data and build the product data array to return
+			
+			// If productData is an array then there are more than one products returned
+			if( productData.length != null ) {
+				numProducts = productData.length;
+			}
+			else {
+				numProducts = 1;
+			}
+			var rawProdObject;
+			var finishedProdObject = new Object();
+			var prodPID;
+			var prodSCID;
+			
+			for( var i=0; i < numProducts; i++ ) {
+				finishedProdObject = {
+					prodPID : '',
+					prodSCID : '',
+					name : '',
+					vendor : '',
+					price : '',
+					salePrice : '',
+					imgSmall : '',
+					imgMed : ''
+				};
+				if( numProducts > 1 ) {
+					rawProdObject = productData[i];
+				}
+				else {
+					rawProdObject = productData;
+				}
+				/**
+				 *	6-digit product ID
+				 *  9-digit style ID
+				 *  name
+				 *  vendor (applies to PL)
+				 *  price (formatted string)
+				 *  sale price (set to '' if not on sale)
+				 *  small image path (category image, not used on site)
+				 *  med image path (QL image)
+				 *  in stock?
+				 **/
+				 
+				// NOT IN STOCK SUPPORT TO FOLLOW
+				if( rawProdObject.isInStock == "true" ) {
+
+					// Check for default style color, then set PID, SCID and images appropriately
+					if( rawProdObject.defaultProductStyleColor != null ) {
+						finishedProdObject.prodPID = rawProdObject.businessCatalogItemId;
+						if( rawProdObject.defaultProductStyleColor.businessCatalogItemId != null ) {
+							finishedProdObject.prodSCID = rawProdObject.defaultProductStyleColor.businessCatalogItemId;
+							if( rawProdObject.defaultProductStyleColor.categoryImage ) {
+								finishedProdObject.imgSmall = rawProdObject.defaultProductStyleColor.categoryImage.path;
+							}
+							if( rawProdObject.defaultProductStyleColor.quicklookImage ) {
+								finishedProdObject.imgMed = rawProdObject.defaultProductStyleColor.quicklookImage.path;
+							}
+						}
+					}
+					else if( rawProdObject.parentBusinessCatalogItemId != null ) {
+						finishedProdObject.prodPID = rawProdObject.parentBusinessCatalogItemId;
+						finishedProdObject.prodSCID = rawProdObject.businessCatalogItemId;
+						if( rawProdObject.categoryImage ) {
+							finishedProdObject.imgSmall = rawProdObject.categoryImage.path;
+						}
+						if( rawProdObject.quicklookImage ) {
+							finishedProdObject.imgMed = rawProdObject.quicklookImage.path;
+						}
+					}
+					
+					// Assign product name
+					finishedProdObject.name = rawProdObject.name;
+											
+					// Set prices
+					// Pricing scenario 1 - regular min = regular max = current max, but current min different, displays as range but low end is sale
+					if( ( rawProdObject.price.regularMinPrice == rawProdObject.price.regularMaxPrice == rawProdObject.price.currentMaxPrice ) && rawProdObject.price.currentMinPrice != rawProdObject.price.currentMaxPrice ) {
+						finishedProdObject.price = '- ' + this.model.currencySymbol;
+						finishedProdObject.price = finishedProdObject.price + parseFloat( rawProdObject.price.regularMinPrice ).toFixed(2).toString();
+						finishedProdObject.salePrice = this.model.currencySymbol;
+						finishedProdObject.salePrice = finishedProdObject.salePrice + parseFloat( rawProdObject.price.currentMinPrice ).toFixed(2).toString();
+					}
+					// Pricing scenario 2 - not on sale, prices are a range
+					else if( ( rawProdObject.price.regularMinPrice != rawProdObject.price.regularMaxPrice ) && ( rawProdObject.price.currentMinPrice != rawProdObject.price.currentMaxPrice ) && ( rawProdObject.price.regularMaxPrice == rawProdObject.price.currentMaxPrice ) && ( rawProdObject.price.regularMinPrice == rawProdObject.price.currentMinPrice ) ) {
+						finishedProdObject.price = this.model.currencySymbol;
+						finishedProdObject.price = finishedProdObject.price + parseFloat( rawProdObject.price.currentMinPrice ).toFixed(2).toString();
+						finishedProdObject.price = finishedProdObject.price + ' - ' + this.model.currencySymbol;
+						finishedProdObject.price = finishedProdObject.price + parseFloat( rawProdObject.price.currentMaxPrice ).toFixed(2).toString();
+					}
+					// Pricing scenario 3 - both regular and sale are ranges
+					else if( ( rawProdObject.price.regularMinPrice != rawProdObject.price.regularMaxPrice ) && ( rawProdObject.price.currentMinPrice != rawProdObject.price.currentMaxPrice ) ) {
+						finishedProdObject.price = this.model.currencySymbol;
+						finishedProdObject.price = finishedProdObject.price + parseFloat( rawProdObject.price.regularMinPrice ).toFixed(2).toString();
+						finishedProdObject.price = finishedProdObject.price + ' - ' + this.model.currencySymbol;
+						finishedProdObject.price = finishedProdObject.price + parseFloat( rawProdObject.price.regularMaxPrice ).toFixed(2).toString();
+						
+						finishedProdObject.salePrice = this.model.currencySymbol;
+						finishedProdObject.salePrice = finishedProdObject.salePrice + parseFloat( rawProdObject.price.currentMinPrice ).toFixed(2).toString();
+						finishedProdObject.salePrice = finishedProdObject.salePrice + ' - ' + this.model.currencySymbol;
+						finishedProdObject.salePrice = finishedProdObject.salePrice + parseFloat( rawProdObject.price.currentMaxPrice ).toFixed(2).toString();
+					}
+					// Pricing scenario 4 - regular min = regular max but sale is range
+					else if( ( rawProdObject.price.regularMinPrice == rawProdObject.price.regularMaxPrice ) && ( rawProdObject.price.currentMinPrice != rawProdObject.price.currentMaxPrice ) ) {
+						finishedProdObject.price = this.model.currencySymbol;
+						finishedProdObject.price = finishedProdObject.price + parseFloat( rawProdObject.price.regularMinPrice ).toFixed(2).toString();
+						
+						finishedProdObject.salePrice = this.model.currencySymbol;
+						finishedProdObject.salePrice = finishedProdObject.salePrice + parseFloat( rawProdObject.price.currentMinPrice ).toFixed(2).toString();
+						finishedProdObject.salePrice = finishedProdObject.salePrice + ' - ' + this.model.currencySymbol;
+						finishedProdObject.salePrice = finishedProdObject.salePrice + parseFloat( rawProdObject.price.currentMaxPrice ).toFixed(2).toString();
+					}
+					// Pricing scenario 5 - regular min = regular max, sale min = sale max
+					else if( ( rawProdObject.price.regularMinPrice == rawProdObject.price.regularMaxPrice ) && ( rawProdObject.price.currentMinPrice == rawProdObject.price.currentMaxPrice ) && ( rawProdObject.price.regularMaxPrice != rawProdObject.price.currentMaxPrice ) ) {
+						finishedProdObject.price = this.model.currencySymbol;
+						finishedProdObject.price = finishedProdObject.price + parseFloat( rawProdObject.price.regularMinPrice ).toFixed(2).toString();
+						
+						finishedProdObject.salePrice = this.model.currencySymbol;
+						finishedProdObject.salePrice = finishedProdObject.salePrice + parseFloat( rawProdObject.price.currentMinPrice ).toFixed(2).toString();
+					}
+					
+					// Pricing scenario 6 - single price, not on sale
+					else if( rawProdObject.price.regularMinPrice == rawProdObject.price.regularMaxPrice == rawProdObject.price.currentMinPrice == rawProdObject.price.currentMaxPrice ) {
+						finishedProdObject.price = this.model.currencySymbol;
+						finishedProdObject.price = finishedProdObject.price + parseFloat( rawProdObject.price.currentMaxPrice ).toFixed(2).toString();
+					}
+					else {
+						finishedProdObject.price = this.model.currencySymbol;
+						finishedProdObject.price = finishedProdObject.price + parseFloat( rawProdObject.price.currentMaxPrice ).toFixed(2).toString();
+					}
+
+					this.model.dataArray.push( finishedProdObject );
+					//console.log( 'array push code - ' + finishedProdObject.name );
+				}
+			}
+		}
+		else if( this.model.apiCallType == "category" && transport.responseJSON.webHierarchyResultV1.rootProductCategory ) {
+			this.model.dataRaw = transport.responseJSON.webHierarchyResultV1.rootProductCategory;
+		}
+		else {
+			this.model.dataRaw = "There has been an error with your request";
+		}
+		eval( this.model.callbackFunction );
+	}
+}
+</script>
+
+
+<script type="text/javascript">
+/*outfiting popup build*/
+var brOutfittingJSON = {
+	"outfits": [
+		{
+			"productCatCID": "1028125"
+		},
+		{
+			"productCatCID": "1028127"
+		},
+		{
+			"productCatCID": "1028130"
+		}
+	]
+}
+
+var outfittingPopup = {
+	model: {
+		wcdAssetPath:"/Asset_Archive/BRWeb/content/0009/320/815/assets/",
+		wcdCIID:"9320815",
+		wcdCID:"1026242",
+		categoryJSON:{},
+		numProducts:0
+	},
+		
+	controller: {
+		init: {},
+		popOutfit: function( outfitIdx ) {
+			var model = outfittingPopup.model;
+			var controller = outfittingPopup.controller;
+			var view = outfittingPopup.view;
+			var numProducts;
+				
+			var outfitData = brOutfittingJSON.outfits[ outfitIdx ];
+			var outfitCID = outfitData.productCatCID;
+				
+			// Hide QL button if exposed
+			if( $('quickLookLauncher').getStyle('visibility') != 'hidden' ) {
+				$('quickLookLauncher').setStyle({ 'visibility':'hidden' });
+			}
+			
+			var wcdCurrencySymbol = '$';
+			
+			//if div has content, don't progress.
+			var outfitDivID = "#popupOutfitLayer"+outfitIdx;
+			if (jQuery(outfitDivID).children().length == 0) {
+				model.categoryJSON = new WCDWebHierarchyHelperLibrary('product',outfitCID,'outfittingPopup.controller.buildOutfitPage(' + outfitIdx + ')','all',wcdCurrencySymbol,false);
+			}
+		},
+			
+		buildOutfitPage: function( outfitIdx ) {
+			var model = outfittingPopup.model;
+			var controller = outfittingPopup.controller;
+			var view = outfittingPopup.view;
+
+			if( model.categoryJSON.model.dataArray.length != null ) {
+				model.numProducts = model.categoryJSON.model.dataArray.length;
+			}
+			else {
+				model.numProducts = 1;
+			}
+			
+			view.displayOutfitOverlay( outfitIdx );
+		
+		}
+	},
+	view: { 
+		displayOutfitOverlay: function( outfitIdx ) {
+
+			var model = outfittingPopup.model;
+			var controller = outfittingPopup.controller;
+			var view = outfittingPopup.view;
+			var outfitDivName = "popupOutfitLayer"+outfitIdx;
+			var outfitIsoHolder = $(outfitDivName);
+			
+			var productGridID = "productGrid"+outfitIdx;
+			
+			var numProducts = model.numProducts;
+
+			var popupWidth = 540;
+			var prodGridWidth = 300;
+			
+			//hide all panes
+			
+			//show appropriate pane
+			
+			
+			outfitIsoHolder.insert( new Element('div',{id:productGridID}) );
+			$(productGridID).className="productGrid";
+			$(productGridID).setStyle({ width:prodGridWidth + 'px' });
+			$(productGridID).insert( new Element('ul') );
+			
+			var prodGrid = $(productGridID).firstDescendant();
+			
+			var wcdBrandId = '2';
+			//if( wcdCDASite == 'cda' ){ wcdBrandId = '8';}
+			//if US => 2
+				
+			for(i=0; i< numProducts; i++) {
+				var outfitProdObject = model.categoryJSON.model.dataArray[i];
+					
+				var outfitProdPID = outfitProdObject.prodPID;
+				var outfitProdSCID = outfitProdObject.prodSCID;
+				var outfitProdName = outfitProdObject.name;
+				var outfitProdImagePath = outfitProdObject.imgMed;
+				var outfitProdPrice = outfitProdObject.price;
+				var outfitProdSalePrice = outfitProdObject.salePrice;
+
+				var outfitProdString = '';
+				outfitProdString += "<a href=\"/browse/product.do?cid=" + model.wcdCID + "&pid=" + outfitProdPID + "&scid=" + outfitProdSCID + "&mlink=" + model.wcdCID + "," + model.wcdCIID + "," + outfitProdSCID + "&clink=" + model.wcdCIID + "\" target=\"_parent\" id=\"outfitProdLink" + outfitProdSCID + "\">";
+		
+				//outfitProdString += "<img alt='' width='120' height='150' src='" + outfitProdImagePath + "' onmouseover=\"quickLook.openQuickLookLauncher('" + outfitProdPID + "','" + outfitProdSCID + "', null,-1,'outfitOutfit" + outfitProdSCID + "', false, '" + wcdBrandId + "');\" onmouseout=\"quickLook.closeQuickLookLauncher(event);\" id=\"outfitOutfit" + outfitProdSCID + "\" />";
+				outfitProdString += "<img alt='' width='120' height='150' src='" + outfitProdImagePath + "' onmouseover=\"quickLook.openQuickLookLauncher('" + outfitProdPID + "','" + outfitProdSCID + "', "+model.wcdCID+",1,'outfitOutfit" + outfitProdSCID + "', false, '" + wcdBrandId + "');\" onmouseout=\"quickLook.closeQuickLookLauncher(event);\" id=\"outfitOutfit" + outfitProdSCID + "\" />";
+		
+				outfitProdString += "<p>" + outfitProdObject.name + "</p>";
+					if( outfitProdSalePrice != '' ) {
+						outfitProdString += "<b style='text-decoration:line-through'>" + outfitProdPrice + "</b>";
+						outfitProdString += "<br /><b style='color:#c00'>" + outfitProdSalePrice + "</b>";
+					}
+					else {
+						outfitProdString += "<b>" + outfitProdPrice + "</b>";
+					}
+				outfitProdString += "</a>";
+						
+				var outfitProdElt = new Element('li', { 'id': 'outfitProd' + outfitProdSCID }).update( outfitProdString );
+				prodGrid.insert({ bottom: outfitProdElt });
+			}
+
+		},
+		
+		closePanes: function( outfitIdx ) {
+			//code to close panes
+		}
+	}
+}
+
+quickLook.openQuickLookLauncher = quickLook.openQuickLookLauncher.wrap(function(om,strProductId, strDefaultStyleColor, 
+strCategoryId, strVariantId, targetImg, isCrossSell, brandCode, customProperties) {
+    om(strProductId, strDefaultStyleColor, strCategoryId, strVariantId, targetImg, isCrossSell, brandCode, customProperties);
+    var target = this.objQuickLookTarget;
+	if( target != null ) {
+	    this.objQuickLookLauncher.setStyle({left: (target.position[0] + target.obj.width/2 - 40) + ("px"), top: (target.position[1] + target.obj.height/2 - this.launcherHalfHeight + 40) + ("px"), width:'79px', height:'23px'}); 
+		setImgSrc('quickLookLauncher','/gid/assets/common/quicklook/en_US/button_quicklook_launcher_on.gif');
+	}
+});
+</script>
+<!--
+<img width="120" height="150" id="outfitOutfit288843002" onmouseout="quickLook.closeQuickLookLauncher(event);" onmouseover="quickLook.openQuickLookLauncher('288843','288843002', null,-1,'outfitOutfit288843002', false, '2');" src="http://www3.assets-gap.com/webcontent/0009/229/220/cn9229220.jpg" alt="">
+
+<img onmousemove="quickLook.openQuickLookLauncher('288775','288775002','94703','1','cimg_288775_288775002_94703_0_1', false,'2');" onmouseout="quickLook.closeQuickLookLauncher(event);" src="http://www1.assets-gap.com/webcontent/0009/356/991/cn9356991.jpg" productimagepath="http://www1.assets-gap.com/webcontent/0009/356/991/cn9356991.jpg" alt="Pleated Crepe Midi Skirt" class="gridProdImg" id="cimg_288775_288775002_94703_0_1" name="cimg_288775_288775002_94703_0_1">-->
+
+<script type="text/javascript">
+
+	document.observe('dom:loaded', function() {
+		reportingService.model.reportRegistry.each(function(viewManager,index) { 
+			if (viewManager.reportName == 'facetedSearch') { 
+				reportingService.model.reportRegistry.splice(index,1);
+			}
+		}); 
+		reportingService.controller.reportingManager.inspectReportRegistry();
+	});
+
+
+	var customLinkTracker = function (eventID,trackingID) {
+		var eventName = "03.09_XO_"+eventID+"_"+trackingID;
+		s.tl( eventName , 'o', eventName);
+	}
+
+	
+	var backToTopAndTrack = function (divName,trackNumber) {
+		Effect.ScrollTo(divName);
+		customLinkTracker("BackToTop",trackNumber);
+	}
+
+	var scrollDownAndTrack = function (divName,pixelOffset,trackName,thisRollover) {
+		Effect.ScrollTo(divName,{offset:pixelOffset});
+		
+		//jQuery(thisRollover).trigger('mouseenter');
+		customLinkTracker("scrollDown",trackName);
+	}
+	
+		//console.info('5.05');
+</script>
+
